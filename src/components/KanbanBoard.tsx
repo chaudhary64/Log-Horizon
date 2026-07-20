@@ -26,6 +26,8 @@ const CATEGORIES = [
   "Instagram Post",
   "LinkedIn Post",
   "YouTube",
+  "YouTube Playlist",
+  "YouTube Shorts",
   "Other"
 ];
 

@@ -40,7 +40,13 @@ export async function POST(req: Request) {
     if (!category) {
       const lowerUrl = url.toLowerCase();
       if (lowerUrl.includes("youtube.com") || lowerUrl.includes("youtu.be")) {
-        finalCategory = "YouTube";
+        if (lowerUrl.includes("playlist?list=")) {
+          finalCategory = "YouTube Playlist";
+        } else if (lowerUrl.includes("/shorts/")) {
+          finalCategory = "YouTube Shorts";
+        } else {
+          finalCategory = "YouTube";
+        }
       } else if (lowerUrl.includes("codepen.io")) {
         finalCategory = "CodePen";
       } else if (lowerUrl.includes("tympanus.net") || lowerUrl.includes("codrops")) {

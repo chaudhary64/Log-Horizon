@@ -93,6 +93,8 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
           <option value="Instagram Post">Instagram Post</option>
           <option value="LinkedIn Post">LinkedIn Post</option>
           <option value="YouTube">YouTube</option>
+          <option value="YouTube Playlist">YouTube Playlist</option>
+          <option value="YouTube Shorts">YouTube Shorts</option>
           <option value="Other">Other</option>
         </select>
         <button type="submit" className={styles.submitButton} disabled={loading} aria-label="Add link to board">
