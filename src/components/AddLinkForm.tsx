@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./kanban.module.css";
 import { Plus } from "lucide-react";
 
@@ -14,6 +14,23 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
   const [customTitle, setCustomTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const urlInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      urlInputRef.current?.focus();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    
+    // Initial focus on mount is handled by autoFocus prop, 
+    // but this ensures it if we need to call it programmatically.
+    handleFocus();
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +43,7 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
       setUrl("");
       setCategory("");
       setCustomTitle("");
+      urlInputRef.current?.focus();
     } catch (err: any) {
       setError(err.message || "Failed to add link");
     } finally {
@@ -38,12 +56,14 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
       <h2 className={styles.formTitle}>Add New Link</h2>
       <form onSubmit={handleSubmit} className={styles.formInputGroup} aria-label="Add a new link">
         <input
+          ref={urlInputRef}
           type="url"
           className={styles.urlInput}
           placeholder="Paste URL here (e.g., https://youtube.com/...)"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
+          autoFocus
           aria-label="Link URL"
         />
         <input

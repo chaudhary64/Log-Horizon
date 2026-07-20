@@ -5,6 +5,7 @@ import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import styles from "./kanban.module.css";
 import Column from "./Column";
 import AddLinkForm from "./AddLinkForm";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 interface Task {
   _id: string;
@@ -20,6 +21,8 @@ const CATEGORIES = ["YouTube", "Codrops Articles", "Codrops 3d Articles", "CodeP
 export default function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -59,8 +62,20 @@ export default function KanbanBoard() {
     }
   };
 
-  const handleDeleteTask = async (id: string) => {
+  const handleDeleteClick = (id: string) => {
+    const task = tasks.find(t => t._id === id);
+    if (task) {
+      setTaskToDelete(task);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!taskToDelete) return;
+    
+    const id = taskToDelete._id;
     setTasks((prev) => prev.filter((t) => t._id !== id));
+    setTaskToDelete(null);
+    
     try {
       await fetch(`/api/tasks/${id}`, { method: "DELETE" });
     } catch (err) {
@@ -145,22 +160,56 @@ export default function KanbanBoard() {
     <div className={styles.mainContent}>
       <AddLinkForm onAdd={handleAddTask} />
       
+      {!loading && (
+        <div className={styles.statsContainer}>
+          <div 
+            className={`${styles.statBadge} ${styles.total} ${activeFilter === null ? styles.active : ''}`}
+            onClick={() => setActiveFilter(null)}
+          >
+            Total Links
+            <span className={styles.statNumber}>{tasks.length}</span>
+          </div>
+          {CATEGORIES.map(category => {
+            const count = tasksByCategory[category]?.length || 0;
+            if (count === 0) return null;
+            return (
+              <div 
+                key={category} 
+                className={`${styles.statBadge} ${activeFilter === category ? styles.active : ''}`}
+                onClick={() => setActiveFilter(category)}
+              >
+                {category}
+                <span className={styles.statNumber}>{count}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {loading ? (
         <div style={{ textAlign: "center", padding: "2rem" }}>Loading board...</div>
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className={styles.board}>
-            {CATEGORIES.filter((category) => tasksByCategory[category].length > 0).map((category) => (
+            {(activeFilter ? [activeFilter] : CATEGORIES.filter((category) => tasksByCategory[category].length > 0)).map((category) => (
               <Column
                 key={category}
                 id={category}
                 title={category}
                 tasks={tasksByCategory[category]}
-                onDeleteTask={handleDeleteTask}
+                onDeleteTask={handleDeleteClick}
               />
             ))}
           </div>
         </DragDropContext>
+      )}
+
+      {taskToDelete && (
+        <DeleteConfirmModal
+          task={taskToDelete}
+          onConfirm={confirmDelete}
+          onCancel={() => setTaskToDelete(null)}
+        />
       )}
     </div>
   );

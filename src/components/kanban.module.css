@@ -101,9 +101,69 @@
   gap: 2rem;
   padding: 0 0 2rem 0;
   align-items: stretch;
-  min-height: calc(100vh - 200px);
   position: relative;
   width: 100%;
+}
+
+/* Board Header & Stats */
+.statsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.statBadge {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 0.5rem 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--foreground);
+  font-size: 0.85rem;
+  box-shadow: 2px 2px 0px var(--primary);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.statBadge:hover, .statBadge.active {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--primary);
+  border-color: var(--primary);
+}
+
+.statBadge.total {
+  box-shadow: 4px 4px 0px var(--primary);
+  font-size: 0.95rem;
+  padding: 0.6rem 1.25rem;
+  border-color: var(--primary);
+}
+
+.statBadge.total:hover, .statBadge.total.active {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--primary);
+}
+
+.statNumber {
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+.statBadge:not(.total) .statNumber {
+  font-size: 0.9rem;
+  padding: 0.2rem 0.5rem;
+  min-width: 2rem;
 }
 
 /* Row Styles (formerly Column) */
@@ -356,4 +416,148 @@
     flex-direction: row;
     align-items: center;
   }
+}
+
+/* Delete Confirm Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: var(--card-bg);
+  border: 2px solid var(--primary);
+  width: 90%;
+  max-width: 450px;
+  padding: 2rem;
+  box-shadow: 8px 8px 0px var(--primary); /* Brutalist boxy shadow */
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.modalTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin: 0;
+}
+
+.modalText {
+  color: var(--foreground);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.modalPreviewCard {
+  border: 1px solid var(--card-border);
+  background: var(--background);
+  margin-bottom: 2rem;
+  box-shadow: 2px 2px 0px var(--card-border);
+}
+
+.modalPreviewImage {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.modalNoPreview {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.modalTaskContent {
+  padding: 1rem;
+}
+
+.modalTaskTitle {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 0 0 0.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.modalTaskDomain {
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modalCancelButton {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--card-border);
+  padding: 0.75rem 1.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.modalCancelButton:hover {
+  background: var(--card-border);
+}
+
+.modalCancelButton:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+
+.modalDeleteButton {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.modalDeleteButton:hover {
+  filter: brightness(1.1);
+  box-shadow: 3px 3px 0px var(--foreground);
+  transform: translate(-2px, -2px);
+}
+
+.modalDeleteButton:focus-visible {
+  outline: 2px solid var(--danger);
+  outline-offset: 2px;
+  box-shadow: 3px 3px 0px var(--foreground);
+  transform: translate(-2px, -2px);
 }
