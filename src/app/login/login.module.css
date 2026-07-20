@@ -1,32 +1,44 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  background-image: radial-gradient(var(--card-border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 .container {
   display: flex;
+  flex: 1;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   padding: 2rem;
 }
 
 .card {
   background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 1rem;
-  padding: 2rem;
+  border: 2px solid var(--primary);
+  padding: 2.5rem;
   width: 100%;
   max-width: 400px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 4px 4px 0px var(--primary);
 }
 
 .title {
-  font-size: 1.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
   text-align: center;
+  color: var(--primary);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .inputGroup {
@@ -36,74 +48,102 @@
 }
 
 .label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #cbd5e1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--foreground);
+  letter-spacing: 0.05em;
 }
 
 .input {
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--card-border);
-  background: var(--background);
+  padding: 0.5rem 0;
+  border: none;
+  border-bottom: 2px solid var(--card-border);
+  background: transparent;
   color: var(--foreground);
   font-size: 1rem;
   transition: border-color 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.input:focus-visible {
+  outline: none;
 }
 
 .button {
-  background: var(--primary);
-  color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: background-color 0.2s, transform 0.1s;
-  margin-top: 0.5rem;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 0.875rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s;
+  margin-top: 1rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px var(--primary);
 }
 
 .button:hover:not(:disabled) {
-  background: var(--primary-hover);
+  background: var(--primary);
+  color: white;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--foreground);
+  border-color: var(--foreground);
 }
 
-.button:active:not(:disabled) {
-  transform: scale(0.98);
+.button:focus-visible:not(:disabled) {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
 }
 
 .button:disabled {
-  opacity: 0.7;
+  opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .toggleText {
   text-align: center;
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  color: #94a3b8;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .toggleButton {
   color: var(--primary);
-  font-weight: 600;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
   background: transparent;
   padding: 0;
   margin-left: 0.5rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s;
 }
 
 .toggleButton:hover {
-  text-decoration: underline;
+  border-color: var(--primary);
 }
 
 .error {
   color: var(--danger);
-  font-size: 0.875rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
   text-align: center;
-  background: rgb(239 68 68 / 0.1);
-  padding: 0.5rem;
-  border-radius: 0.375rem;
+  background: rgba(255, 68, 68, 0.05);
+  padding: 0.75rem;
+  border: 1px solid var(--danger);
 }

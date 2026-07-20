@@ -4,5 +4,5 @@ import { cookies } from "next/headers";
 export async function POST(request: Request) {
   const cookieStore = await cookies();
   cookieStore.delete("token");
-  return NextResponse.redirect(new URL("/login", request.url), 303);
+  return NextResponse.redirect(new URL("/", request.url), 303);
 }

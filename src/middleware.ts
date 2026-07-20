@@ -8,6 +8,7 @@ export async function middleware(req: NextRequest) {
 
   const isAuthPage = req.nextUrl.pathname.startsWith("/login");
   const isApiAuthRoute = req.nextUrl.pathname.startsWith("/api/auth");
+  const isHomePage = req.nextUrl.pathname === "/";
 
   if (isApiAuthRoute) {
     return NextResponse.next();
@@ -15,8 +16,12 @@ export async function middleware(req: NextRequest) {
 
   if (isAuthPage) {
     if (verifiedToken) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/board", req.url));
     }
+    return NextResponse.next();
+  }
+
+  if (isHomePage) {
     return NextResponse.next();
   }
 

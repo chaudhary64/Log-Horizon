@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
 import { useToast } from "@/contexts/ToastContext";
+import Navbar from "@/components/Navbar";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -46,52 +47,57 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>{isLogin ? "Welcome Back" : "Create Account"}</h1>
-        
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.inputGroup}>
-            <label htmlFor="email" className={styles.label}>Email</label>
-            <input
-              id="email"
-              type="email"
-              className={styles.input}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="you@example.com"
-            />
-          </div>
+    <div className={styles.pageWrapper}>
+      <Navbar isLoggedIn={false} tasks={[]} />
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h1 className={styles.title}>{isLogin ? "Welcome Back" : "Create Account"}</h1>
+          
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <label htmlFor="email" className={styles.label}>Email</label>
+              <input
+                id="email"
+                type="email"
+                className={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="you@example.com"
+              />
+            </div>
 
-          <div className={styles.inputGroup}>
-            <label htmlFor="password" className={styles.label}>Password</label>
-            <input
-              id="password"
-              type="password"
-              className={styles.input}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="password" className={styles.label}>Password</label>
+              <input
+                id="password"
+                type="password"
+                className={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+              />
+            </div>
 
-          <button type="submit" className={styles.button} disabled={loading}>
-            {loading ? "Please wait..." : (isLogin ? "Sign In" : "Sign Up")}
-          </button>
-        </form>
+            {error && <div className={styles.error}>{error}</div>}
 
-        <p className={styles.toggleText}>
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
-          <button 
-            type="button" 
-            className={styles.toggleButton}
-            onClick={() => setIsLogin(!isLogin)}
-          >
-            {isLogin ? "Sign Up" : "Sign In"}
-          </button>
-        </p>
+            <button type="submit" className={styles.button} disabled={loading}>
+              {loading ? "Please wait..." : (isLogin ? "Sign In" : "Sign Up")}
+            </button>
+          </form>
+
+          <p className={styles.toggleText}>
+            {isLogin ? "Don't have an account?" : "Already have an account?"}
+            <button 
+              type="button" 
+              className={styles.toggleButton}
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? "Sign Up" : "Sign In"}
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
