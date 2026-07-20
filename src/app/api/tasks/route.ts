@@ -22,36 +22,88 @@ export async function POST(req: Request) {
     const user = await getUserFromCookie();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { url, category } = await req.json();
+    const { url, category, title } = await req.json();
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // Auto-categorize YouTube links if no explicit category is provided
-    let finalCategory = category || "Inbox";
-    if (!category && (url.includes("youtube.com") || url.includes("youtu.be"))) {
-      finalCategory = "YouTube";
+    await connectToDatabase();
+    
+    // Check for duplicates
+    const existingTask = await Task.findOne({ userId: user.userId, url });
+    if (existingTask) {
+      return NextResponse.json({ error: `This link already exists in the '${existingTask.category}' column!` }, { status: 409 });
+    }
+
+    // Auto-categorize links if no explicit category is provided
+    let finalCategory = category || "Other";
+    if (!category) {
+      const lowerUrl = url.toLowerCase();
+      if (lowerUrl.includes("youtube.com") || lowerUrl.includes("youtu.be")) {
+        finalCategory = "YouTube";
+      } else if (lowerUrl.includes("codepen.io")) {
+        finalCategory = "CodePen";
+      } else if (lowerUrl.includes("tympanus.net") || lowerUrl.includes("codrops")) {
+        // Default to Codrops Articles, but detect 3d if possible
+        if (lowerUrl.includes("3d")) {
+          finalCategory = "Codrops 3d Articles";
+        } else {
+          finalCategory = "Codrops Articles";
+        }
+      } else if (lowerUrl.includes("blog") || lowerUrl.includes("tutorial") || lowerUrl.includes("medium.com") || lowerUrl.includes("dev.to") || lowerUrl.includes("hashnode")) {
+        finalCategory = "Blog Tutorial";
+      }
     }
 
     // Fetch link preview
     let previewImage = "";
-    let previewTitle = "";
+    let previewTitle = title || ""; // Use user-provided custom title if available
     let previewDescription = "";
 
     try {
-      const previewData: any = await getLinkPreview(url);
-      if (previewData) {
-        previewTitle = previewData.title || "";
-        previewDescription = previewData.description || "";
-        if (previewData.images && previewData.images.length > 0) {
-          previewImage = previewData.images[0];
+      const isYouTube = url.includes("youtube.com") || url.includes("youtu.be");
+      const isCodePen = url.includes("codepen.io");
+
+      if (isYouTube) {
+        // Use YouTube oEmbed API which never blocks bots
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+        const res = await fetch(oembedUrl);
+        if (res.ok) {
+          const data = await res.json();
+          previewTitle = previewTitle || data.title || "";
+          previewImage = data.thumbnail_url || "";
+          previewDescription = data.author_name ? `By ${data.author_name}` : "";
+        }
+      } else if (isCodePen) {
+        // Bypass Cloudflare by manually constructing the CodePen metadata
+        const codepenMatch = url.match(/codepen\.io\/([^/]+)\/(?:pen|full|details)\/([^/?]+)/i);
+        if (codepenMatch) {
+          const username = codepenMatch[1];
+          const penId = codepenMatch[2];
+          previewTitle = previewTitle || `CodePen by ${username}`; // Fallback if custom title not provided
+          previewImage = `https://shots.codepen.io/${username}/pen/${penId}-800.jpg`;
+          previewDescription = "View on CodePen";
+        }
+      } 
+      
+      // Fallback for non-YouTube/non-CodePen links, or if we still need an image/description
+      if (!previewTitle || !previewImage) {
+        const previewData: any = await getLinkPreview(url, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+          }
+        });
+        if (previewData) {
+          previewTitle = previewTitle || previewData.title || "";
+          previewDescription = previewDescription || previewData.description || "";
+          if (!previewImage && previewData.images && previewData.images.length > 0) {
+            previewImage = previewData.images[0];
+          }
         }
       }
     } catch (err) {
       console.error("Error fetching link preview", err);
     }
-
-    await connectToDatabase();
 
     const maxOrderTask = await Task.findOne({ userId: user.userId, category: finalCategory }).sort("-order");
     const newOrder = maxOrderTask ? maxOrderTask.order + 1 : 0;

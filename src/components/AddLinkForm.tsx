@@ -5,23 +5,29 @@ import styles from "./kanban.module.css";
 import { Plus } from "lucide-react";
 
 interface AddLinkFormProps {
-  onAdd: (url: string, category: string) => void;
+  onAdd: (url: string, category: string, customTitle?: string) => void;
 }
 
 export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
   const [url, setUrl] = useState("");
   const [category, setCategory] = useState("");
+  const [customTitle, setCustomTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url) return;
 
     setLoading(true);
+    setError("");
     try {
-      await onAdd(url, category);
+      await onAdd(url, category, customTitle.trim());
       setUrl("");
       setCategory("");
+      setCustomTitle("");
+    } catch (err: any) {
+      setError(err.message || "Failed to add link");
     } finally {
       setLoading(false);
     }
@@ -30,7 +36,7 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
   return (
     <div className={styles.formContainer}>
       <h2 className={styles.formTitle}>Add New Link</h2>
-      <form onSubmit={handleSubmit} className={styles.formInputGroup}>
+      <form onSubmit={handleSubmit} className={styles.formInputGroup} aria-label="Add a new link">
         <input
           type="url"
           className={styles.urlInput}
@@ -38,23 +44,36 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
+          aria-label="Link URL"
+        />
+        <input
+          type="text"
+          className={styles.urlInput}
+          placeholder="Custom Title (Optional)"
+          value={customTitle}
+          onChange={(e) => setCustomTitle(e.target.value)}
+          aria-label="Custom Title"
         />
         <select
           className={styles.categorySelect}
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          aria-label="Select category"
         >
-          <option value="">Auto-Detect / Inbox</option>
-          <option value="Inbox">Inbox</option>
+          <option value="">Auto-Detect</option>
           <option value="YouTube">YouTube</option>
-          <option value="Reading List">Reading List</option>
-          <option value="Done">Done</option>
+          <option value="Codrops Articles">Codrops Articles</option>
+          <option value="Codrops 3d Articles">Codrops 3d Articles</option>
+          <option value="CodePen">CodePen</option>
+          <option value="Blog Tutorial">Blog Tutorial</option>
+          <option value="Other">Other</option>
         </select>
-        <button type="submit" className={styles.submitButton} disabled={loading}>
-          <Plus size={20} />
+        <button type="submit" className={styles.submitButton} disabled={loading} aria-label="Add link to board">
+          <Plus size={20} aria-hidden="true" />
           {loading ? "Adding..." : "Add Link"}
         </button>
       </form>
+      {error && <div style={{ color: "var(--danger)", fontSize: "0.875rem", marginTop: "0.5rem", fontFamily: "Space Grotesk, sans-serif", fontWeight: 600 }}>{error}</div>}
     </div>
   );
 }

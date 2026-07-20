@@ -15,7 +15,7 @@ interface Task {
   previewDescription?: string;
 }
 
-const CATEGORIES = ["Inbox", "YouTube", "Reading List", "Done"];
+const CATEGORIES = ["YouTube", "Codrops Articles", "Codrops 3d Articles", "CodePen", "Blog Tutorial", "Other"];
 
 export default function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -39,19 +39,23 @@ export default function KanbanBoard() {
     }
   };
 
-  const handleAddTask = async (url: string, category: string) => {
+  const handleAddTask = async (url: string, category: string, customTitle?: string) => {
     try {
       const res = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, category }),
+        body: JSON.stringify({ url, category, title: customTitle }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to add task");
+      }
       if (data.task) {
         setTasks((prev) => [...prev, data.task]);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      throw err;
     }
   };
 
@@ -118,12 +122,11 @@ export default function KanbanBoard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           category: destination.droppableId, 
-          order: destination.index // Simplistic ordering, might need refinement for complex cases
+          order: destination.index
         }),
       });
     } catch (err) {
       console.error("Failed to update task", err);
-      // Revert in real app
     }
   };
 
@@ -134,7 +137,7 @@ export default function KanbanBoard() {
     if (tasksByCategory[task.category]) {
       tasksByCategory[task.category].push(task);
     } else {
-      tasksByCategory["Inbox"].push(task);
+      tasksByCategory["Other"].push(task);
     }
   });
 
@@ -147,7 +150,7 @@ export default function KanbanBoard() {
       ) : (
         <DragDropContext onDragEnd={onDragEnd}>
           <div className={styles.board}>
-            {CATEGORIES.map((category) => (
+            {CATEGORIES.filter((category) => tasksByCategory[category].length > 0).map((category) => (
               <Column
                 key={category}
                 id={category}

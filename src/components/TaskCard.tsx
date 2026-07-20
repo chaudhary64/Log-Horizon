@@ -50,6 +50,10 @@ export default function TaskCard({ task, index, onDelete }: TaskCardProps) {
             <Trash2 size={14} />
           </button>
           
+          <div className={styles.cardNumber}>
+            {index + 1}
+          </div>
+          
           <a href={task.url} target="_blank" rel="noopener noreferrer">
             {task.previewImage ? (
               <img src={task.previewImage} alt="Preview" className={styles.previewImage} />

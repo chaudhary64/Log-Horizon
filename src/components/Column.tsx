@@ -26,11 +26,11 @@ export default function Column({ id, title, tasks, onDeleteTask }: ColumnProps) 
       <div className={styles.columnHeader}>
         <h2 className={styles.columnTitle}>
           {title}
-          <span className={styles.taskCount}>{tasks.length}</span>
+          <span className={styles.taskCount}>Total items: {tasks.length}</span>
         </h2>
       </div>
 
-      <Droppable droppableId={id}>
+      <Droppable droppableId={id} direction="horizontal">
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
