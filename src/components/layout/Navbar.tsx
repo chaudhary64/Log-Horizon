@@ -11,6 +11,7 @@ interface Task {
   previewTitle?: string;
   previewDescription?: string;
   createdAt: string;
+  order: number;
 }
 
 interface NavbarProps {

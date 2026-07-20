@@ -11,6 +11,8 @@ interface Task {
   previewImage?: string;
   previewTitle?: string;
   previewDescription?: string;
+  createdAt: string;
+  order: number;
 }
 
 interface MoveConfirmModalProps {

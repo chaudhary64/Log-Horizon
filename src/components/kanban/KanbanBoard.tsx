@@ -20,6 +20,7 @@ interface Task {
   previewTitle?: string;
   previewDescription?: string;
   createdAt: string;
+  order: number;
 }
 
 const CATEGORIES = [
@@ -189,20 +190,42 @@ export default function KanbanBoard() {
        }
     }
 
+    // Recalculate order for affected columns
+    const affectedCategories = new Set([source.droppableId, destination.droppableId]);
+    const bulkUpdates: { _id: string; category: string; order: number }[] = [];
+
+    affectedCategories.forEach(cat => {
+      let currentOrder = 0;
+      updatedTasks.forEach(t => {
+        if (t.category === cat) {
+          t.order = currentOrder;
+          bulkUpdates.push({ _id: t._id, category: t.category, order: currentOrder });
+          currentOrder++;
+        }
+      });
+    });
+
     setTasks(updatedTasks);
 
-    // Persist to database
+    // Persist to database via bulk update
     try {
-      await fetch(`/api/tasks/${draggableId}`, {
+      const res = await fetch(`/api/tasks/reorder`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          category: destination.droppableId, 
-          order: destination.index
-        }),
+        body: JSON.stringify({ updates: bulkUpdates }),
       });
-    } catch (err) {
-      console.error("Failed to update task", err);
+      
+      if (!res.ok) {
+        throw new Error("Failed to save new order");
+      }
+      
+      toast.success("Order Saved", "Link order has been successfully updated");
+    } catch (err: any) {
+      console.error("Failed to update tasks", err);
+      toast.error("Save Failed", err.message || "Failed to update link order");
+      // Note: A full page refresh or re-fetch might be needed here to sync state
+      // if the backend update failed, but optimistic UI stays updated.
+      // fetchTasks(); 
     }
   };
 

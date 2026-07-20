@@ -19,6 +19,7 @@ export default async function LandingPage() {
       category: t.category,
       previewTitle: t.previewTitle,
       previewDescription: t.previewDescription,
+      order: (t as any).order || 0,
       createdAt: (t as any).createdAt?.toISOString() || new Date().toISOString()
     }));
   }
