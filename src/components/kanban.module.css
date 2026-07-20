@@ -325,7 +325,7 @@
 }
 
 .noPreview {
-  height: 80px;
+  height: 160px;
   background: var(--background);
   border-bottom: 1px solid var(--card-border);
   display: flex;
