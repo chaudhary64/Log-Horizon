@@ -18,9 +18,10 @@ interface ColumnProps {
   title: string;
   tasks: Task[];
   onDeleteTask: (id: string) => void;
+  onMoveTask: (id: string) => void;
 }
 
-export default function Column({ id, title, tasks, onDeleteTask }: ColumnProps) {
+export default function Column({ id, title, tasks, onDeleteTask, onMoveTask }: ColumnProps) {
   return (
     <div className={styles.column}>
       <div className={styles.columnHeader}>
@@ -38,7 +39,7 @@ export default function Column({ id, title, tasks, onDeleteTask }: ColumnProps) 
             className={`${styles.columnList} ${snapshot.isDraggingOver ? styles.draggingOver : ""}`}
           >
             {tasks.map((task, index) => (
-              <TaskCard key={task._id} task={task} index={index} onDelete={onDeleteTask} />
+              <TaskCard key={task._id} task={task} index={index} onDelete={onDeleteTask} onMove={onMoveTask} />
             ))}
             {provided.placeholder}
           </div>

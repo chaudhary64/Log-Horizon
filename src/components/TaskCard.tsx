@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import styles from "./kanban.module.css";
-import { Link2, Trash2 } from "lucide-react";
+import { Link2, Trash2, FolderInput } from "lucide-react";
 
 interface Task {
   _id: string;
@@ -18,9 +18,10 @@ interface TaskCardProps {
   task: Task;
   index: number;
   onDelete: (id: string) => void;
+  onMove: (id: string) => void;
 }
 
-export default function TaskCard({ task, index, onDelete }: TaskCardProps) {
+export default function TaskCard({ task, index, onDelete, onMove }: TaskCardProps) {
   const [imageError, setImageError] = useState(false);
 
   // Extract domain for display
@@ -34,6 +35,11 @@ export default function TaskCard({ task, index, onDelete }: TaskCardProps) {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault();
     onDelete(task._id);
+  };
+
+  const handleMove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onMove(task._id);
   };
 
   return (
@@ -51,6 +57,9 @@ export default function TaskCard({ task, index, onDelete }: TaskCardProps) {
         >
           <button className={styles.deleteButton} onClick={handleDelete} title="Delete Task">
             <Trash2 size={14} />
+          </button>
+          <button className={styles.moveButton} onClick={handleMove} title="Move Task">
+            <FolderInput size={14} />
           </button>
           
           <div className={styles.cardNumber}>

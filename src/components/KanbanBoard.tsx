@@ -6,6 +6,7 @@ import styles from "./kanban.module.css";
 import Column from "./Column";
 import AddLinkForm from "./AddLinkForm";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import MoveConfirmModal from "./MoveConfirmModal";
 import { useToast } from "@/contexts/ToastContext";
 
 interface Task {
@@ -36,6 +37,7 @@ export default function KanbanBoard() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [taskToMove, setTaskToMove] = useState<Task | null>(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -97,6 +99,44 @@ export default function KanbanBoard() {
     } catch (err: any) {
       console.error(err);
       toast.error("Delete Failed", err.message || "Failed to delete the link");
+    }
+  };
+
+  const handleMoveClick = (id: string) => {
+    const task = tasks.find(t => t._id === id);
+    if (task) {
+      setTaskToMove(task);
+    }
+  };
+
+  const confirmMove = async (newCategory: string) => {
+    if (!taskToMove) return;
+    
+    if (taskToMove.category === newCategory) {
+      setTaskToMove(null);
+      return;
+    }
+
+    const id = taskToMove._id;
+    const oldCategory = taskToMove.category;
+    
+    // Optimistic update
+    setTasks(prev => prev.map(t => t._id === id ? { ...t, category: newCategory } : t));
+    setTaskToMove(null);
+    
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category: newCategory }),
+      });
+      if (!res.ok) throw new Error("Failed to move task");
+      toast.success("Link Moved", `Successfully moved to ${newCategory}`);
+    } catch (err: any) {
+      console.error(err);
+      // Revert optimistic update
+      setTasks(prev => prev.map(t => t._id === id ? { ...t, category: oldCategory } : t));
+      toast.error("Move Failed", err.message || "Failed to move the link");
     }
   };
 
@@ -215,6 +255,7 @@ export default function KanbanBoard() {
                 title={category}
                 tasks={tasksByCategory[category]}
                 onDeleteTask={handleDeleteClick}
+                onMoveTask={handleMoveClick}
               />
             ))}
           </div>
@@ -226,6 +267,15 @@ export default function KanbanBoard() {
           task={taskToDelete}
           onConfirm={confirmDelete}
           onCancel={() => setTaskToDelete(null)}
+        />
+      )}
+
+      {taskToMove && (
+        <MoveConfirmModal
+          task={taskToMove}
+          categories={CATEGORIES}
+          onConfirm={confirmMove}
+          onCancel={() => setTaskToMove(null)}
         />
       )}
     </div>

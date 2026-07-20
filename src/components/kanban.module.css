@@ -253,6 +253,27 @@
 
 .deleteButton {
   position: absolute;
+  top: 2.5rem;
+  right: 0.5rem;
+  background: var(--primary);
+  color: white;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+  z-index: 10;
+}
+
+.taskCard:hover .deleteButton,
+.taskCard:hover .moveButton {
+  opacity: 1;
+}
+
+.moveButton {
+  position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   background: var(--primary);
@@ -267,8 +288,8 @@
   z-index: 10;
 }
 
-.taskCard:hover .deleteButton {
-  opacity: 1;
+.moveButton:hover {
+  background: var(--primary-hover);
 }
 
 .deleteButton:hover {
@@ -555,6 +576,31 @@
 
 .modalDeleteButton:focus-visible {
   outline: 2px solid var(--danger);
+  outline-offset: 2px;
+  box-shadow: 3px 3px 0px var(--foreground);
+  transform: translate(-2px, -2px);
+}
+
+.modalMoveButton {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.modalMoveButton:hover {
+  background: var(--primary-hover);
+  box-shadow: 3px 3px 0px var(--foreground);
+  transform: translate(-2px, -2px);
+}
+
+.modalMoveButton:focus-visible {
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
   box-shadow: 3px 3px 0px var(--foreground);
   transform: translate(-2px, -2px);
