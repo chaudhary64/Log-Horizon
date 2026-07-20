@@ -52,7 +52,7 @@ export default function LoginPage() {
       <div className={styles.container}>
         <div className={styles.card}>
           <h1 className={styles.title}>{isLogin ? "Welcome Back" : "Create Account"}</h1>
-          
+
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.inputGroup}>
               <label htmlFor="email" className={styles.label}>Email</label>
@@ -89,8 +89,8 @@ export default function LoginPage() {
 
           <p className={styles.toggleText}>
             {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={styles.toggleButton}
               onClick={() => setIsLogin(!isLogin)}
             >
