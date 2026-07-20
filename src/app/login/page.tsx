@@ -36,7 +36,7 @@ export default function LoginPage() {
       }
 
       toast.success(isLogin ? "Welcome Back!" : "Account Created", isLogin ? "You have successfully logged in." : "Your account has been created successfully.");
-      router.push("/");
+      router.push("/board");
       router.refresh();
     } catch (err: any) {
       toast.error(isLogin ? "Login Failed" : "Signup Failed", err.message);

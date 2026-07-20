@@ -214,7 +214,8 @@ export default function KanbanBoard() {
   });
 
   return (
-    <div className={styles.mainContent}>
+    <div className={styles.pageWrapper}>
+      <div className={styles.mainContent}>
       <AddLinkForm onAdd={handleAddTask} />
       
       {!loading && (
@@ -279,5 +280,6 @@ export default function KanbanBoard() {
         />
       )}
     </div>
+  </div>
   );
 }
