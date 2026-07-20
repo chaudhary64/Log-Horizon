@@ -1,3 +1,72 @@
+/* Navbar Styles */
+.header {
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid var(--primary);
+  background: var(--card-bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.headerTitle {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.loginBtn {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 0.5rem 1.25rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0px var(--primary);
+}
+
+.loginBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--primary);
+}
+
+.signupBtn, .logoutButton {
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
+  padding: 0.5rem 1.25rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0px var(--foreground);
+  cursor: pointer;
+}
+
+.signupBtn:hover, .logoutButton:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--foreground);
+}
+
 /* AddLinkForm Styles */
 .formContainer {
   background: var(--card-bg);
@@ -105,7 +174,6 @@
   width: 100%;
 }
 
-/* Board Header & Stats */
 .statsContainer {
   display: flex;
   flex-wrap: wrap;

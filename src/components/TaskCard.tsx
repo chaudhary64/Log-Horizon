@@ -12,6 +12,7 @@ interface Task {
   previewImage?: string;
   previewTitle?: string;
   previewDescription?: string;
+  createdAt: string;
 }
 
 interface TaskCardProps {

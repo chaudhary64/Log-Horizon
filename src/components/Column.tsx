@@ -13,6 +13,7 @@ interface Task {
   previewImage?: string;
   previewTitle?: string;
   previewDescription?: string;
+  createdAt: string;
 }
 
 interface ColumnProps {
@@ -65,7 +66,13 @@ export default function Column({ id, title, tasks, onDeleteTask, onMoveTask }: C
             className={`${styles.columnList} ${snapshot.isDraggingOver ? styles.draggingOver : ""}`}
           >
             {tasks.map((task, index) => (
-              <TaskCard key={task._id} task={task} index={index} onDelete={onDeleteTask} onMove={onMoveTask} />
+              <TaskCard 
+                key={task._id} 
+                task={task} 
+                index={index} 
+                onDelete={onDeleteTask} 
+                onMove={onMoveTask} 
+              />
             ))}
             {provided.placeholder}
           </div>

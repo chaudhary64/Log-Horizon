@@ -2,51 +2,30 @@ import Link from "next/link";
 import { LayoutDashboard, Zap, Network, Layers, Quote } from "lucide-react";
 import styles from "./landing.module.css";
 import { getUserFromCookie } from "@/lib/auth";
+import connectToDatabase from "@/lib/mongodb";
+import Task from "@/models/Task";
+import Navbar from "@/components/Navbar";
 
 export default async function LandingPage() {
   const user = await getUserFromCookie();
+  
+  let tasks: any[] = [];
+  if (user) {
+    await connectToDatabase();
+    const tasksData = await Task.find({ userId: user.userId }).lean();
+    tasks = tasksData.map(t => ({
+      _id: t._id.toString(),
+      url: t.url,
+      category: t.category,
+      previewTitle: t.previewTitle,
+      previewDescription: t.previewDescription,
+      createdAt: (t as any).createdAt?.toISOString() || new Date().toISOString()
+    }));
+  }
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.logo}>
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="square"
-              strokeLinejoin="miter"
-            >
-              <rect width="18" height="18" x="3" y="3" />
-              <path d="M8 7v10" />
-              <path d="M12 7v10" />
-              <path d="M16 7v10" />
-            </svg>
-            LOG HORIZON
-          </div>
-          
-          <div className={styles.nav}>
-            {user ? (
-              <Link href="/board" className={styles.signupBtn}>
-                Go to Board
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" className={styles.loginBtn}>
-                  Login
-                </Link>
-                <Link href="/login" className={styles.signupBtn}>
-                  Sign Up
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <Navbar isLoggedIn={!!user} tasks={tasks} />
 
       <main className={styles.main}>
         <h1 className={styles.heroTitle}>
