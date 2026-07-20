@@ -1,0 +1,116 @@
+.toastContainer {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+@media (max-width: 640px) {
+  .toastContainer {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    max-width: none;
+  }
+}
+
+.toastWrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  background-color: var(--bg);
+  border: 2px solid var(--text);
+  box-shadow: 4px 4px 0px var(--text);
+  overflow: hidden;
+  padding: 1rem;
+  animation: toast-in 0.2s ease-out forwards;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.2;
+}
+
+.message {
+  font-size: 0.875rem;
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: opacity 0.15s;
+  opacity: 0.6;
+}
+
+.closeButton:hover {
+  opacity: 1;
+}
+
+.progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+}
+
+/* Variants */
+.success .icon { color: #10b981; }
+.success .progress { background-color: #10b981; }
+
+.error .icon { color: var(--danger); }
+.error .progress { background-color: var(--danger); }
+
+.warning .icon { color: #f59e0b; }
+.warning .progress { background-color: #f59e0b; }
+
+.info .icon { color: var(--primary); }
+.info .progress { background-color: var(--primary); }

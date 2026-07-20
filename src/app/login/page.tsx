@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
+import { useToast } from "@/contexts/ToastContext";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,10 +12,10 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const toast = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
@@ -34,10 +35,11 @@ export default function LoginPage() {
         throw new Error(data.error || "Something went wrong");
       }
 
+      toast.success(isLogin ? "Welcome Back!" : "Account Created", isLogin ? "You have successfully logged in." : "Your account has been created successfully.");
       router.push("/");
       router.refresh();
     } catch (err: any) {
-      setError(err.message);
+      toast.error(isLogin ? "Login Failed" : "Signup Failed", err.message);
     } finally {
       setLoading(false);
     }
@@ -49,8 +51,6 @@ export default function LoginPage() {
         <h1 className={styles.title}>{isLogin ? "Welcome Back" : "Create Account"}</h1>
         
         <form onSubmit={handleSubmit} className={styles.form}>
-          {error && <div className={styles.error}>{error}</div>}
-          
           <div className={styles.inputGroup}>
             <label htmlFor="email" className={styles.label}>Email</label>
             <input

@@ -6,6 +6,7 @@ import styles from "./kanban.module.css";
 import Column from "./Column";
 import AddLinkForm from "./AddLinkForm";
 import DeleteConfirmModal from "./DeleteConfirmModal";
+import { useToast } from "@/contexts/ToastContext";
 
 interface Task {
   _id: string;
@@ -33,6 +34,7 @@ export default function KanbanBoard() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     fetchTasks();
@@ -65,6 +67,7 @@ export default function KanbanBoard() {
       }
       if (data.task) {
         setTasks((prev) => [...prev, data.task]);
+        return data.task.category;
       }
     } catch (err: any) {
       console.error(err);
@@ -88,8 +91,10 @@ export default function KanbanBoard() {
     
     try {
       await fetch(`/api/tasks/${id}`, { method: "DELETE" });
-    } catch (err) {
+      toast.info("Link Deleted", "The link has been removed from your board.");
+    } catch (err: any) {
       console.error(err);
+      toast.error("Delete Failed", err.message || "Failed to delete the link");
     }
   };
 

@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./kanban.module.css";
 import { Plus } from "lucide-react";
+import { useToast } from "@/contexts/ToastContext";
 
 interface AddLinkFormProps {
-  onAdd: (url: string, category: string, customTitle?: string) => void;
+  onAdd: (url: string, category: string, customTitle?: string) => Promise<string | undefined> | void;
 }
 
 export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
@@ -13,8 +14,8 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
   const [category, setCategory] = useState("");
   const [customTitle, setCustomTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const urlInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   useEffect(() => {
     const handleFocus = () => {
@@ -37,15 +38,18 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
     if (!url) return;
 
     setLoading(true);
-    setError("");
+    setLoading(true);
     try {
-      await onAdd(url, category, customTitle.trim());
+      const addedCategory = await onAdd(url, category, customTitle.trim());
       setUrl("");
       setCategory("");
       setCustomTitle("");
+      
+      const categoryName = addedCategory || category || "the board";
+      toast.success("Link Added", `Your link was successfully added to ${categoryName}.`);
       urlInputRef.current?.focus();
     } catch (err: any) {
-      setError(err.message || "Failed to add link");
+      toast.error("Failed to add link", err.message || "An error occurred while adding the link.");
     } finally {
       setLoading(false);
     }
@@ -96,7 +100,6 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
           {loading ? "Adding..." : "Add Link"}
         </button>
       </form>
-      {error && <div style={{ color: "var(--danger)", fontSize: "0.875rem", marginTop: "0.5rem", fontFamily: "Space Grotesk, sans-serif", fontWeight: 600 }}>{error}</div>}
     </div>
   );
 }
