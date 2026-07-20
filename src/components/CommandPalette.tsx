@@ -23,6 +23,16 @@ export default function CommandPalette({ tasks }: CommandPaletteProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (resultsRef.current) {
+      const selectedEl = resultsRef.current.querySelector(`.${styles.selected}`);
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [selectedIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -83,7 +93,7 @@ export default function CommandPalette({ tasks }: CommandPaletteProps) {
       </div>
 
       {showResults && (
-        <div className={styles.results}>
+        <div className={styles.results} ref={resultsRef}>
           {filteredTasks.length === 0 ? (
             <div className={styles.emptyState}>No results found for "{query}"</div>
           ) : (

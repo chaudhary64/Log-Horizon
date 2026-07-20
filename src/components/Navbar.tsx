@@ -51,7 +51,7 @@ export default function Navbar({ isLoggedIn, tasks = [] }: NavbarProps) {
               </Link>
               <form action="/api/auth/logout" method="POST" style={{ margin: 0 }}>
                 <button type="submit" className={styles.logoutButton}>
-                  <LogOut size={18} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                  <LogOut size={18} />
                   Sign Out
                 </button>
               </form>

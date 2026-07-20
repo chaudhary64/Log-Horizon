@@ -48,7 +48,7 @@
   box-shadow: 4px 4px 0px var(--primary);
 }
 
-.signupBtn, .logoutButton {
+.signupBtn {
   background: var(--primary);
   color: white;
   border: 2px solid var(--primary);
@@ -62,9 +62,32 @@
   cursor: pointer;
 }
 
-.signupBtn:hover, .logoutButton:hover {
+.signupBtn:hover {
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0px var(--foreground);
+}
+
+.logoutButton {
+  background: transparent;
+  color: var(--danger);
+  border: 2px solid var(--danger);
+  padding: 0.5rem 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 2px 2px 0px var(--danger);
+}
+
+.logoutButton:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px var(--danger);
+  background: rgba(255, 68, 68, 0.1);
 }
 
 /* AddLinkForm Styles */
