@@ -28,7 +28,6 @@
   width: 100%;
   background-color: var(--background);
   border: 2px solid var(--foreground);
-  box-shadow: 4px 4px 0px var(--foreground);
   overflow: hidden;
   padding: 1rem;
   animation: toast-in 0.2s ease-out forwards;
