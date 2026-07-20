@@ -16,7 +16,15 @@ interface Task {
   previewDescription?: string;
 }
 
-const CATEGORIES = ["YouTube", "Codrops Articles", "Codrops 3d Articles", "CodePen", "Blog Tutorial", "Other"];
+const CATEGORIES = [
+  "Blog Tutorial",
+  "CodePen",
+  "Codrops 3d Articles",
+  "Codrops Articles",
+  "Decoded Websites",
+  "YouTube",
+  "Other"
+];
 
 export default function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);

@@ -81,11 +81,12 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
           aria-label="Select category"
         >
           <option value="">Auto-Detect</option>
-          <option value="YouTube">YouTube</option>
-          <option value="Codrops Articles">Codrops Articles</option>
-          <option value="Codrops 3d Articles">Codrops 3d Articles</option>
-          <option value="CodePen">CodePen</option>
           <option value="Blog Tutorial">Blog Tutorial</option>
+          <option value="CodePen">CodePen</option>
+          <option value="Codrops 3d Articles">Codrops 3d Articles</option>
+          <option value="Codrops Articles">Codrops Articles</option>
+          <option value="Decoded Websites">Decoded Websites</option>
+          <option value="YouTube">YouTube</option>
           <option value="Other">Other</option>
         </select>
         <button type="submit" className={styles.submitButton} disabled={loading} aria-label="Add link to board">
