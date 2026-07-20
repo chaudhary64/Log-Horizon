@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { LayoutDashboard, Zap, Network, Layers, Quote } from "lucide-react";
-import styles from "./landing.module.css";
+import styles from "./page.module.css";
 import { getUserFromCookie } from "@/lib/auth";
 import connectToDatabase from "@/lib/mongodb";
 import Task from "@/models/Task";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/layout/Navbar";
 
 export default async function LandingPage() {
   const user = await getUserFromCookie();

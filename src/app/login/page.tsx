@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
 import { useToast } from "@/contexts/ToastContext";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/layout/Navbar";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);

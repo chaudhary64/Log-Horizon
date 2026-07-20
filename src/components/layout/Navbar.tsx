@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { LogOut } from "lucide-react";
-import styles from "./kanban.module.css";
+import styles from "../kanban/kanban.module.css";
 import CommandPalette from "./CommandPalette";
 
 interface Task {

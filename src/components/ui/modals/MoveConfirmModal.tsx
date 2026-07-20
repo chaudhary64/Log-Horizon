@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import styles from "./kanban.module.css";
-import { Link2, AlertTriangle } from "lucide-react";
+import styles from "../../kanban/kanban.module.css";
+import { Link2, FolderInput } from "lucide-react";
 
 interface Task {
   _id: string;
@@ -13,19 +13,20 @@ interface Task {
   previewDescription?: string;
 }
 
-interface DeleteConfirmModalProps {
+interface MoveConfirmModalProps {
   task: Task;
-  onConfirm: () => void;
+  categories: string[];
+  onConfirm: (newCategory: string) => void;
   onCancel: () => void;
 }
 
-export default function DeleteConfirmModal({ task, onConfirm, onCancel }: DeleteConfirmModalProps) {
-  const deleteBtnRef = useRef<HTMLButtonElement>(null);
+export default function MoveConfirmModal({ task, categories, onConfirm, onCancel }: MoveConfirmModalProps) {
+  const [selectedCategory, setSelectedCategory] = useState(task.category);
   const [imageError, setImageError] = useState(false);
+  const moveBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    // Focus the delete button by default on mount
-    deleteBtnRef.current?.focus();
+    moveBtnRef.current?.focus();
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -41,13 +42,25 @@ export default function DeleteConfirmModal({ task, onConfirm, onCancel }: Delete
     <div className={styles.modalOverlay} onClick={onCancel} role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <AlertTriangle color="var(--danger)" size={24} />
-          <h2 id="modal-title" className={styles.modalTitle}>Delete Link?</h2>
+          <FolderInput color="var(--primary)" size={24} />
+          <h2 id="modal-title" className={styles.modalTitle}>Move Link?</h2>
         </div>
         
         <p className={styles.modalText}>
-          Are you sure you want to delete this link? This action cannot be undone.
+          Select a new category for this link:
         </p>
+        
+        <select
+          className={styles.categorySelect}
+          style={{ width: "100%", marginBottom: "1.5rem" }}
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          aria-label="Select new category"
+        >
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
 
         <div className={styles.modalPreviewCard}>
           {task.previewImage && !imageError ? (
@@ -83,11 +96,11 @@ export default function DeleteConfirmModal({ task, onConfirm, onCancel }: Delete
           </button>
           <button 
             type="button" 
-            className={styles.modalDeleteButton} 
-            onClick={onConfirm}
-            ref={deleteBtnRef}
+            className={styles.modalMoveButton} 
+            onClick={() => onConfirm(selectedCategory)}
+            ref={moveBtnRef}
           >
-            Delete
+            Move
           </button>
         </div>
       </div>

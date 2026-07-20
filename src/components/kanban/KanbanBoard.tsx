@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { LogOut } from "lucide-react";
 import styles from "./kanban.module.css";
-import Navbar from "./Navbar";
+import Navbar from "../layout/Navbar";
 import Column from "./Column";
 import AddLinkForm from "./AddLinkForm";
-import DeleteConfirmModal from "./DeleteConfirmModal";
-import MoveConfirmModal from "./MoveConfirmModal";
-import CommandPalette from "./CommandPalette";
+import DeleteConfirmModal from "../ui/modals/DeleteConfirmModal";
+import MoveConfirmModal from "../ui/modals/MoveConfirmModal";
+import CommandPalette from "../layout/CommandPalette";
 import { useToast } from "@/contexts/ToastContext";
 
 interface Task {
