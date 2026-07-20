@@ -224,7 +224,6 @@
   min-height: 220px;
   overflow-x: auto;
   align-items: flex-start;
-  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -238,7 +237,6 @@
   min-width: 300px;
   height: 280px; /* Fixed height for exact uniformity */
   flex-shrink: 0;
-  scroll-snap-align: start;
   background: var(--card-bg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
