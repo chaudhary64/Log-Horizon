@@ -52,6 +52,8 @@ export async function POST(req: Request) {
         }
       } else if (lowerUrl.includes("linkedin.com")) {
         finalCategory = "LinkedIn Post";
+      } else if (lowerUrl.includes("instagram.com")) {
+        finalCategory = "Instagram Post";
       } else if (lowerUrl.includes("blog") || lowerUrl.includes("tutorial") || lowerUrl.includes("medium.com") || lowerUrl.includes("dev.to") || lowerUrl.includes("hashnode")) {
         finalCategory = "Blog Tutorial";
       }

@@ -22,6 +22,7 @@ const CATEGORIES = [
   "Codrops 3d Articles",
   "Codrops Articles",
   "Decoded Websites",
+  "Instagram Post",
   "LinkedIn Post",
   "YouTube",
   "Other"
