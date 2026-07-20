@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./kanban.module.css";
 import { Link2, AlertTriangle } from "lucide-react";
 
@@ -21,6 +21,7 @@ interface DeleteConfirmModalProps {
 
 export default function DeleteConfirmModal({ task, onConfirm, onCancel }: DeleteConfirmModalProps) {
   const deleteBtnRef = useRef<HTMLButtonElement>(null);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     // Focus the delete button by default on mount
@@ -49,8 +50,13 @@ export default function DeleteConfirmModal({ task, onConfirm, onCancel }: Delete
         </p>
 
         <div className={styles.modalPreviewCard}>
-          {task.previewImage ? (
-            <img src={task.previewImage} alt="Preview" className={styles.modalPreviewImage} />
+          {task.previewImage && !imageError ? (
+            <img 
+              src={task.previewImage} 
+              alt="Preview" 
+              className={styles.modalPreviewImage} 
+              onError={() => setImageError(true)}
+            />
           ) : (
             <div className={styles.modalNoPreview}>
               <Link2 size={32} />

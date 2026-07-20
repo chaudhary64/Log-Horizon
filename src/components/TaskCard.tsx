@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import styles from "./kanban.module.css";
 import { Link2, Trash2 } from "lucide-react";
@@ -20,6 +21,8 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, index, onDelete }: TaskCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   // Extract domain for display
   let domain = "";
   try {
@@ -55,8 +58,13 @@ export default function TaskCard({ task, index, onDelete }: TaskCardProps) {
           </div>
           
           <a href={task.url} target="_blank" rel="noopener noreferrer">
-            {task.previewImage ? (
-              <img src={task.previewImage} alt="Preview" className={styles.previewImage} />
+            {task.previewImage && !imageError ? (
+              <img 
+                src={task.previewImage} 
+                alt="Preview" 
+                className={styles.previewImage} 
+                onError={() => setImageError(true)}
+              />
             ) : (
               <div className={styles.noPreview}>
                 <Link2 size={32} />

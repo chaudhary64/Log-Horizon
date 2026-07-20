@@ -86,6 +86,7 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
           <option value="Codrops 3d Articles">Codrops 3d Articles</option>
           <option value="Codrops Articles">Codrops Articles</option>
           <option value="Decoded Websites">Decoded Websites</option>
+          <option value="LinkedIn Post">LinkedIn Post</option>
           <option value="YouTube">YouTube</option>
           <option value="Other">Other</option>
         </select>
