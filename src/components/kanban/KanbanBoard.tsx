@@ -277,7 +277,13 @@ export default function KanbanBoard() {
       {loading ? (
         <div style={{ textAlign: "center", padding: "2rem" }}>Loading board...</div>
       ) : (
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext 
+          onDragStart={() => document.body.classList.add('is-dragging')}
+          onDragEnd={(result) => {
+            document.body.classList.remove('is-dragging');
+            onDragEnd(result);
+          }}
+        >
           <div className={styles.board}>
             {(activeFilter ? [activeFilter] : CATEGORIES.filter((category) => tasksByCategory[category].length > 0)).map((category) => (
               <Column

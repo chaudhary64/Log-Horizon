@@ -68,13 +68,24 @@ export default function TaskCard({ task, index, onDelete, onMove }: TaskCardProp
             {index + 1}
           </div>
           
-          <a href={task.url} target="_blank" rel="noopener noreferrer">
+          <div 
+            role="link"
+            tabIndex={0}
+            onClick={() => window.open(task.url, "_blank", "noopener,noreferrer")}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                window.open(task.url, "_blank", "noopener,noreferrer");
+              }
+            }}
+            style={{ cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column' }}
+          >
             {task.previewImage && !imageError ? (
               <img 
                 src={task.previewImage} 
                 alt="Preview" 
                 className={styles.previewImage} 
                 onError={() => setImageError(true)}
+                draggable={false}
               />
             ) : (
               <div className={styles.noPreview}>
@@ -90,7 +101,7 @@ export default function TaskCard({ task, index, onDelete, onMove }: TaskCardProp
                 {domain}
               </div>
             </div>
-          </a>
+          </div>
         </div>
       )}
     </Draggable>
