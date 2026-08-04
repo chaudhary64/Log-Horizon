@@ -41,7 +41,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .card {
@@ -49,6 +49,12 @@
   border: 2px solid var(--primary);
   padding: 2rem;
   box-shadow: 6px 6px 0px var(--primary);
+  display: flex;
+  flex-direction: column;
+}
+
+.card .buttonRow {
+  margin-top: auto;
 }
 
 .cardHeader {
