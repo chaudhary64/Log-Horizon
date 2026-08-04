@@ -582,6 +582,23 @@
   color: var(--danger);
 }
 
+.navLink {
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: color 0.2s, border-color 0.2s;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 0.25rem;
+}
+
+.navLink:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
 .pageWrapper {
   padding: 2rem;
   width: 100%;
@@ -632,7 +649,7 @@
     width: 100%;
   }
 
-  .loginBtn, .signupBtn, .logoutButton {
+  .loginBtn, .signupBtn, .logoutButton, .navLink {
     width: 100%;
     justify-content: center;
   }

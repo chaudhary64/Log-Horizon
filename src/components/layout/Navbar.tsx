@@ -54,6 +54,9 @@ export default function Navbar({ isLoggedIn, tasks = [] }: NavbarProps) {
                 <Link href="/board" className={styles.loginBtn}>
                   Board
                 </Link>
+                <Link href="/settings" className={styles.navLink}>
+                  Settings
+                </Link>
                 <form action="/api/auth/logout" method="POST" style={{ margin: 0 }}>
                   <button type="submit" className={styles.logoutButton}>
                     <LogOut size={18} />

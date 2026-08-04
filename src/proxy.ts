@@ -22,6 +22,9 @@ export async function proxy(req: NextRequest) {
   }
 
   if (isHomePage) {
+    if (verifiedToken) {
+      return NextResponse.redirect(new URL("/board", req.url));
+    }
     return NextResponse.next();
   }
 
