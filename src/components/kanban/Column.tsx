@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Droppable } from "@hello-pangea/dnd";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import styles from "./kanban.module.css";
 import TaskCard from "./TaskCard";
 
@@ -39,6 +39,15 @@ export default function Column({ id, title, tasks, onDeleteTask, onMoveTask, onM
     }
   };
 
+  const jump = (direction: "start" | "end") => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        left: direction === "start" ? 0 : scrollContainerRef.current.scrollWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <div className={styles.column}>
       <div className={styles.columnHeader}>
@@ -48,11 +57,17 @@ export default function Column({ id, title, tasks, onDeleteTask, onMoveTask, onM
         </h2>
         
         <div className={styles.scrollControls}>
+          <button onClick={() => jump("start")} className={styles.scrollJumpBtn} aria-label="Jump to start">
+            <ChevronsLeft size={20} />
+          </button>
           <button onClick={() => scroll("left")} className={styles.scrollBtn} aria-label="Scroll left">
             <ChevronLeft size={20} />
           </button>
           <button onClick={() => scroll("right")} className={styles.scrollBtn} aria-label="Scroll right">
             <ChevronRight size={20} />
+          </button>
+          <button onClick={() => jump("end")} className={styles.scrollJumpBtn} aria-label="Jump to end">
+            <ChevronsRight size={20} />
           </button>
         </div>
       </div>
