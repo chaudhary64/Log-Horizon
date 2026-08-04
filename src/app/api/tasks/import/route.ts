@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import Task from "@/models/Task";
+import User from "@/models/User";
 import { getUserFromCookie } from "@/lib/auth";
+import { MAX_CATEGORIES, getUserCategoryState } from "@/lib/categories";
 
 const DEFAULT_CATEGORY = "Other";
 const MAX_IMPORT_ITEMS = 10000;
@@ -130,6 +132,8 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
 
+    const userDoc = await User.findById(user.userId);
+
     const existingTasks = await Task.find({ userId: user.userId }).select("url category order");
     const existingUrls = new Set(existingTasks.map((t) => duplicateKey(t.url || "")));
 
@@ -207,6 +211,23 @@ export async function POST(req: Request) {
         order++;
       });
     });
+
+    if (userDoc) {
+      const { categories: userCategories } = getUserCategoryState(userDoc);
+      let changed = false;
+      for (const cat of tasksByCategory.keys()) {
+        if (userCategories.length >= MAX_CATEGORIES) break;
+        if (!userCategories.some((c: string) => c.toLowerCase() === cat.toLowerCase())) {
+          userCategories.push(cat);
+          changed = true;
+        }
+      }
+      if (changed) {
+        userDoc.categories = userCategories;
+        userDoc.markModified("categories");
+        await userDoc.save();
+      }
+    }
 
     const inserted = await Task.insertMany(docs);
 

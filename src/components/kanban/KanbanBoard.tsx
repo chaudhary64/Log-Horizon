@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import { LogOut } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import styles from "./kanban.module.css";
 import Navbar from "../layout/Navbar";
 import Column from "./Column";
 import AddLinkForm from "./AddLinkForm";
 import DeleteConfirmModal from "../ui/modals/DeleteConfirmModal";
 import MoveConfirmModal from "../ui/modals/MoveConfirmModal";
-import CommandPalette from "../layout/CommandPalette";
+import ManageColumnsModal from "./ManageColumnsModal";
 import { useToast } from "@/contexts/ToastContext";
 
 interface Task {
@@ -23,31 +23,23 @@ interface Task {
   order: number;
 }
 
-const CATEGORIES = [
-  "Blog Tutorial",
-  "CodePen",
-  "Codrops 3d Articles",
-  "Codrops Articles",
-  "Decoded Websites",
-  "Instagram Post",
-  "LinkedIn Post",
-  "YouTube",
-  "YouTube Playlist",
-  "YouTube Shorts",
-  "Other"
-];
+interface KanbanBoardProps {
+  categories: string[];
+  hiddenCategories: string[];
+}
 
-export default function KanbanBoard() {
+export default function KanbanBoard({ categories: initialCategories, hiddenCategories: initialHiddenCategories }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<string[]>(initialCategories);
+  const [hiddenCategories, setHiddenCategories] = useState<string[]>(initialHiddenCategories);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [taskToMove, setTaskToMove] = useState<Task | null>(null);
+  const [manageOpen, setManageOpen] = useState(false);
   const toast = useToast();
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
+  const visibleCategories = categories.filter((cat) => !hiddenCategories.includes(cat));
 
   const fetchTasks = async () => {
     try {
@@ -61,6 +53,61 @@ export default function KanbanBoard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(fetchTasks, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const syncCategoryState = (data: { categories?: string[]; hiddenCategories?: string[] }) => {
+    if (Array.isArray(data.categories)) {
+      setCategories(data.categories);
+    }
+    if (Array.isArray(data.hiddenCategories)) {
+      setHiddenCategories(data.hiddenCategories);
+    }
+  };
+
+  const handleAddCategory = async (name: string) => {
+    const res = await fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to add column");
+    syncCategoryState(data);
+    toast.success("Column Added", `Created the '${name}' column.`);
+  };
+
+  const handleRenameCategory = async (oldName: string, newName: string) => {
+    const res = await fetch("/api/categories/rename", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ oldName, newName }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to rename column");
+    syncCategoryState(data);
+    setTasks((prev) =>
+      prev.map((t) => (t.category === oldName ? { ...t, category: newName } : t))
+    );
+    if (activeFilter === oldName) setActiveFilter(newName);
+    toast.success("Column Renamed", `'${oldName}' is now '${newName}'.`);
+  };
+
+  const handleToggleHidden = async (name: string, hidden: boolean) => {
+    const res = await fetch("/api/categories/hide", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, hidden }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to update column");
+    syncCategoryState(data);
+    if (hidden && activeFilter === name) setActiveFilter(null);
+    toast.info(hidden ? "Column Hidden" : "Column Shown", `'${name}' is ${hidden ? "now hidden" : "visible again"}.`);
   };
 
   const handleAddTask = async (url: string, category: string, customTitle?: string) => {
@@ -78,9 +125,9 @@ export default function KanbanBoard() {
         setTasks((prev) => [...prev, data.task]);
         return data.task.category;
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      throw err;
+      throw err instanceof Error ? err : new Error("Failed to add task");
     }
   };
 
@@ -101,9 +148,9 @@ export default function KanbanBoard() {
     try {
       await fetch(`/api/tasks/${id}`, { method: "DELETE" });
       toast.info("Link Deleted", "The link has been removed from your board.");
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      toast.error("Delete Failed", err.message || "Failed to delete the link");
+      toast.error("Delete Failed", err instanceof Error ? err.message : "Failed to delete the link");
     }
   };
 
@@ -125,7 +172,6 @@ export default function KanbanBoard() {
     const id = taskToMove._id;
     const oldCategory = taskToMove.category;
     
-    // Optimistic update
     setTasks(prev => prev.map(t => t._id === id ? { ...t, category: newCategory } : t));
     setTaskToMove(null);
     
@@ -137,11 +183,10 @@ export default function KanbanBoard() {
       });
       if (!res.ok) throw new Error("Failed to move task");
       toast.success("Link Moved", `Successfully moved to ${newCategory}`);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      // Revert optimistic update
       setTasks(prev => prev.map(t => t._id === id ? { ...t, category: oldCategory } : t));
-      toast.error("Move Failed", err.message || "Failed to move the link");
+      toast.error("Move Failed", err instanceof Error ? err.message : "Failed to move the link");
     }
   };
 
@@ -159,7 +204,6 @@ export default function KanbanBoard() {
     const bulkUpdates: { _id: string; category: string; order: number }[] =
       reorderedCategory.map((t, i) => ({ _id: t._id, category: t.category, order: i }));
 
-    // Optimistically reorder the in-memory tasks array
     setTasks((prev) => {
       const idx = prev.findIndex((t) => t._id === id);
       if (idx === -1) return prev;
@@ -182,9 +226,9 @@ export default function KanbanBoard() {
         throw new Error("Failed to save new order");
       }
       toast.success("Moved to Top", `${task.previewTitle || "Link"} is now first in ${task.category}.`);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to move to top", err);
-      toast.error("Move Failed", err.message || "Failed to update link order");
+      toast.error("Move Failed", err instanceof Error ? err.message : "Failed to update link order");
     }
   };
 
@@ -199,23 +243,19 @@ export default function KanbanBoard() {
       return;
     }
 
-    // Optimistically update UI
     const updatedTasks = Array.from(tasks);
     const draggedTaskIndex = updatedTasks.findIndex((t) => t._id === draggableId);
     if (draggedTaskIndex === -1) return;
 
     const [draggedTask] = updatedTasks.splice(draggedTaskIndex, 1);
     
-    // Update category if moved to a different column
     if (source.droppableId !== destination.droppableId) {
       draggedTask.category = destination.droppableId;
     }
 
-    // Find index to insert in the entire tasks array to maintain order relative to destination category
     const destinationTasks = updatedTasks.filter((t) => t.category === destination.droppableId);
     
     if (destination.index === 0) {
-       // Insert at beginning of category
        const firstDestTask = updatedTasks.findIndex((t) => t.category === destination.droppableId);
        if(firstDestTask !== -1) {
          updatedTasks.splice(firstDestTask, 0, draggedTask);
@@ -223,7 +263,6 @@ export default function KanbanBoard() {
          updatedTasks.push(draggedTask);
        }
     } else {
-       // Insert after the element at destination.index - 1
        const taskBeforeDest = destinationTasks[destination.index - 1];
        if (taskBeforeDest) {
          const insertIndex = updatedTasks.findIndex((t) => t._id === taskBeforeDest._id);
@@ -233,7 +272,6 @@ export default function KanbanBoard() {
        }
     }
 
-    // Recalculate order for affected columns
     const affectedCategories = new Set([source.droppableId, destination.droppableId]);
     const bulkUpdates: { _id: string; category: string; order: number }[] = [];
 
@@ -250,7 +288,6 @@ export default function KanbanBoard() {
 
     setTasks(updatedTasks);
 
-    // Persist to database via bulk update
     try {
       const res = await fetch(`/api/tasks/reorder`, {
         method: "PUT",
@@ -263,18 +300,15 @@ export default function KanbanBoard() {
       }
       
       toast.success("Order Saved", "Link order has been successfully updated");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to update tasks", err);
-      toast.error("Save Failed", err.message || "Failed to update link order");
-      // Note: A full page refresh or re-fetch might be needed here to sync state
-      // if the backend update failed, but optimistic UI stays updated.
-      // fetchTasks(); 
+      toast.error("Save Failed", err instanceof Error ? err.message : "Failed to update link order");
     }
   };
 
-  // Group tasks by category
   const tasksByCategory: Record<string, Task[]> = {};
-  CATEGORIES.forEach((cat) => (tasksByCategory[cat] = []));
+  categories.forEach((cat) => (tasksByCategory[cat] = []));
+  tasksByCategory["Other"] = tasksByCategory["Other"] || [];
   tasks.forEach((task) => {
     if (tasksByCategory[task.category]) {
       tasksByCategory[task.category].push(task);
@@ -283,13 +317,24 @@ export default function KanbanBoard() {
     }
   });
 
+  const visibleWithTasks = visibleCategories.filter(
+    (category) => tasksByCategory[category].length > 0
+  );
+
   return (
     <>
       <Navbar isLoggedIn={true} tasks={tasks} />
 
       <div className={styles.pageWrapper}>
         <div className={styles.mainContent}>
-      <AddLinkForm onAdd={handleAddTask} />
+      <AddLinkForm onAdd={handleAddTask} categories={visibleCategories} />
+      
+      <div className={styles.boardToolbar}>
+        <button className={styles.manageColumnsBtn} onClick={() => setManageOpen(true)}>
+          <SlidersHorizontal size={16} />
+          Manage Columns
+        </button>
+      </div>
       
       {!loading && (
         <div className={styles.statsContainer}>
@@ -300,7 +345,7 @@ export default function KanbanBoard() {
             Total Links
             <span className={styles.statNumber}>{tasks.length}</span>
           </div>
-          {CATEGORIES.map(category => {
+          {visibleCategories.map(category => {
             const count = tasksByCategory[category]?.length || 0;
             if (count === 0) return null;
             return (
@@ -319,6 +364,14 @@ export default function KanbanBoard() {
 
       {loading ? (
         <div style={{ textAlign: "center", padding: "2rem" }}>Loading board...</div>
+      ) : visibleWithTasks.length === 0 ? (
+        <div className={styles.emptyBoard}>
+          <p>No visible columns yet. Add a link or manage your columns.</p>
+          <button className={styles.manageColumnsBtn} onClick={() => setManageOpen(true)}>
+            <SlidersHorizontal size={16} />
+            Manage Columns
+          </button>
+        </div>
       ) : (
         <DragDropContext 
           onDragStart={() => document.body.classList.add('is-dragging')}
@@ -328,7 +381,7 @@ export default function KanbanBoard() {
           }}
         >
           <div className={styles.board}>
-            {(activeFilter ? [activeFilter] : CATEGORIES.filter((category) => tasksByCategory[category].length > 0)).map((category) => (
+            {(activeFilter ? [activeFilter] : visibleWithTasks).map((category) => (
               <Column
                 key={category}
                 id={category}
@@ -354,9 +407,20 @@ export default function KanbanBoard() {
       {taskToMove && (
         <MoveConfirmModal
           task={taskToMove}
-          categories={CATEGORIES}
+          categories={visibleCategories}
           onConfirm={confirmMove}
           onCancel={() => setTaskToMove(null)}
+        />
+      )}
+
+      {manageOpen && (
+        <ManageColumnsModal
+          categories={categories}
+          hiddenCategories={hiddenCategories}
+          onAdd={handleAddCategory}
+          onRename={handleRenameCategory}
+          onToggleHidden={handleToggleHidden}
+          onClose={() => setManageOpen(false)}
         />
       )}
     </div>

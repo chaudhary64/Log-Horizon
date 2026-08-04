@@ -19,6 +19,23 @@ interface CommandPaletteProps {
   tasks: Task[];
 }
 
+const highlight = (text: string, query: string): React.ReactNode => {
+  if (!query) return text;
+  const lowerText = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let idx = lowerText.indexOf(lowerQuery);
+  while (idx !== -1) {
+    if (idx > lastIndex) parts.push(text.slice(lastIndex, idx));
+    parts.push(<mark key={idx}>{text.slice(idx, idx + query.length)}</mark>);
+    lastIndex = idx + query.length;
+    idx = lowerText.indexOf(lowerQuery, lastIndex);
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return parts;
+};
+
 export default function CommandPalette({ tasks }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -96,13 +113,17 @@ export default function CommandPalette({ tasks }: CommandPaletteProps) {
       {showResults && (
         <div className={styles.results} ref={resultsRef}>
           {filteredTasks.length === 0 ? (
-            <div className={styles.emptyState}>No results found for "{query}"</div>
+            <div className={styles.emptyState}>No results found for &quot;{query}&quot;</div>
           ) : (
-            filteredTasks.map((task, index) => {
+            <>
+              <div className={styles.resultsHeader}>
+                {filteredTasks.length} result{filteredTasks.length === 1 ? "" : "s"} for &quot;{query}&quot;
+              </div>
+            {filteredTasks.map((task, index) => {
               let domain = "";
               try {
                 domain = new URL(task.url).hostname.replace("www.", "");
-              } catch (e) {
+              } catch {
                 domain = task.url;
               }
 
@@ -116,13 +137,14 @@ export default function CommandPalette({ tasks }: CommandPaletteProps) {
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className={styles.resultTitle}>
-                    {task.previewTitle || task.url}
+                    {highlight(task.previewTitle || task.url, query)}
                     <span className={styles.categoryBadge}>{task.category}</span>
                   </div>
                   <div className={styles.resultUrl}>{domain}</div>
                 </a>
               );
-            })
+            })}
+            </>
           )}
         </div>
       )}

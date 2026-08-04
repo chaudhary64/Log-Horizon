@@ -1,7 +1,8 @@
 import KanbanBoard from "@/components/kanban/KanbanBoard";
-import { LogOut } from "lucide-react";
-import styles from "@/components/kanban/kanban.module.css";
 import { getUserFromCookie } from "@/lib/auth";
+import connectToDatabase from "@/lib/mongodb";
+import User from "@/models/User";
+import { getUserCategoryState } from "@/lib/categories";
 import { redirect } from "next/navigation";
 
 export default async function BoardPage() {
@@ -11,11 +12,14 @@ export default async function BoardPage() {
     redirect("/login");
   }
 
+  await connectToDatabase();
+  const userDoc = await User.findById(user.userId);
+
+  const { categories, hiddenCategories } = getUserCategoryState(userDoc ?? {});
+
   return (
     <main>
-
-      
-      <KanbanBoard />
+      <KanbanBoard categories={categories} hiddenCategories={hiddenCategories} />
     </main>
   );
 }

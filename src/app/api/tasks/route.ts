@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb";
 import Task from "@/models/Task";
+import User from "@/models/User";
 import { getUserFromCookie } from "@/lib/auth";
+import { getUserCategoryState } from "@/lib/categories";
 import { getLinkPreview } from "link-preview-js";
 
 export async function GET() {
@@ -12,8 +14,9 @@ export async function GET() {
     await connectToDatabase();
     const tasks = await Task.find({ userId: user.userId }).sort({ order: 1 });
     return NextResponse.json({ tasks });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -29,6 +32,8 @@ export async function POST(req: Request) {
 
     await connectToDatabase();
     
+    const userDoc = await User.findById(user.userId);
+
     // Check for duplicates
     const existingTask = await Task.findOne({ userId: user.userId, url });
     if (existingTask) {
@@ -65,6 +70,31 @@ export async function POST(req: Request) {
       }
     }
 
+    // Resolve the detected category against the user's custom columns
+    if (userDoc) {
+      const { categories: userCategories, hiddenCategories: userHidden } =
+        getUserCategoryState(userDoc);
+      const visibleCategories = userCategories.filter(
+        (c: string) => !userHidden.includes(c)
+      );
+      if (!userCategories.includes(finalCategory)) {
+        const aliases =
+          userDoc.categoryAliases && typeof userDoc.categoryAliases === "object"
+            ? userDoc.categoryAliases
+            : {};
+        finalCategory =
+          typeof aliases[finalCategory] === "string" ? aliases[finalCategory] : "Other";
+        if (!userCategories.includes(finalCategory)) {
+          finalCategory = "Other";
+        }
+      }
+      if (userHidden.includes(finalCategory)) {
+        finalCategory = visibleCategories.includes("Other")
+          ? "Other"
+          : visibleCategories[0] || "Other";
+      }
+    }
+
     // Fetch link preview
     let previewImage = "";
     let previewTitle = title || ""; // Use user-provided custom title if available
@@ -98,11 +128,11 @@ export async function POST(req: Request) {
       
       // Fallback for non-YouTube/non-CodePen links, or if we still need an image/description
       if (!previewTitle || !previewImage) {
-        const previewData: any = await getLinkPreview(url, {
+        const previewData = (await getLinkPreview(url, {
           headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
           }
-        });
+        })) as { title?: string; description?: string; images?: string[] } | null;
         if (previewData) {
           previewTitle = previewTitle || previewData.title || "";
           previewDescription = previewDescription || previewData.description || "";
@@ -130,7 +160,8 @@ export async function POST(req: Request) {
 
     await newTask.save();
     return NextResponse.json({ task: newTask }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

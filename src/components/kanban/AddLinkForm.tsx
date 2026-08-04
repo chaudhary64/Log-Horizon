@@ -7,9 +7,10 @@ import { useToast } from "@/contexts/ToastContext";
 
 interface AddLinkFormProps {
   onAdd: (url: string, category: string, customTitle?: string) => Promise<string | undefined> | void;
+  categories: string[];
 }
 
-export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
+export default function AddLinkForm({ onAdd, categories }: AddLinkFormProps) {
   const [url, setUrl] = useState("");
   const [category, setCategory] = useState("");
   const [customTitle, setCustomTitle] = useState("");
@@ -48,8 +49,8 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
       const categoryName = addedCategory || category || "the board";
       toast.success("Link Added", `Your link was successfully added to ${categoryName}.`);
       urlInputRef.current?.focus();
-    } catch (err: any) {
-      toast.error("Failed to add link", err.message || "An error occurred while adding the link.");
+    } catch (err) {
+      toast.error("Failed to add link", err instanceof Error ? err.message : "An error occurred while adding the link.");
     } finally {
       setLoading(false);
     }
@@ -85,17 +86,9 @@ export default function AddLinkForm({ onAdd }: AddLinkFormProps) {
           aria-label="Select category"
         >
           <option value="">Auto-Detect</option>
-          <option value="Blog Tutorial">Blog Tutorial</option>
-          <option value="CodePen">CodePen</option>
-          <option value="Codrops 3d Articles">Codrops 3d Articles</option>
-          <option value="Codrops Articles">Codrops Articles</option>
-          <option value="Decoded Websites">Decoded Websites</option>
-          <option value="Instagram Post">Instagram Post</option>
-          <option value="LinkedIn Post">LinkedIn Post</option>
-          <option value="YouTube">YouTube</option>
-          <option value="YouTube Playlist">YouTube Playlist</option>
-          <option value="YouTube Shorts">YouTube Shorts</option>
-          <option value="Other">Other</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
         </select>
         <button type="submit" className={styles.submitButton} disabled={loading} aria-label="Add link to board">
           <Plus size={20} aria-hidden="true" />
