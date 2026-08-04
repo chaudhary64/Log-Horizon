@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Draggable } from "@hello-pangea/dnd";
 import styles from "./kanban.module.css";
-import { Link2, Trash2, FolderInput } from "lucide-react";
+import { Link2, Trash2, FolderInput, ArrowUpToLine } from "lucide-react";
 
 interface Task {
   _id: string;
@@ -21,9 +21,10 @@ interface TaskCardProps {
   index: number;
   onDelete: (id: string) => void;
   onMove: (id: string) => void;
+  onMoveToTop: (id: string) => void;
 }
 
-export default function TaskCard({ task, index, onDelete, onMove }: TaskCardProps) {
+export default function TaskCard({ task, index, onDelete, onMove, onMoveToTop }: TaskCardProps) {
   const [imageError, setImageError] = useState(false);
 
   // Extract domain for display
@@ -44,6 +45,11 @@ export default function TaskCard({ task, index, onDelete, onMove }: TaskCardProp
     onMove(task._id);
   };
 
+  const handleMoveToTop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onMoveToTop(task._id);
+  };
+
   return (
     <Draggable draggableId={task._id} index={index}>
       {(provided, snapshot) => (
@@ -62,6 +68,9 @@ export default function TaskCard({ task, index, onDelete, onMove }: TaskCardProp
           </button>
           <button className={styles.moveButton} onClick={handleMove} title="Move Task">
             <FolderInput size={14} />
+          </button>
+          <button className={styles.topButton} onClick={handleMoveToTop} title="Move to Top">
+            <ArrowUpToLine size={14} />
           </button>
           
           <div className={styles.cardNumber}>

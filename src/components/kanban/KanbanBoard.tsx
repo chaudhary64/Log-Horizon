@@ -145,6 +145,49 @@ export default function KanbanBoard() {
     }
   };
 
+  const handleMoveToTop = async (id: string) => {
+    const task = tasks.find((t) => t._id === id);
+    if (!task) return;
+
+    const categoryTasks = tasks
+      .filter((t) => t.category === task.category)
+      .sort((a, b) => a.order - b.order);
+
+    if (categoryTasks[0]?._id === id) return;
+
+    const reorderedCategory = [task, ...categoryTasks.filter((t) => t._id !== id)];
+    const bulkUpdates: { _id: string; category: string; order: number }[] =
+      reorderedCategory.map((t, i) => ({ _id: t._id, category: t.category, order: i }));
+
+    // Optimistically reorder the in-memory tasks array
+    setTasks((prev) => {
+      const idx = prev.findIndex((t) => t._id === id);
+      if (idx === -1) return prev;
+      const moved = prev[idx];
+      const rest = prev.filter((t) => t._id !== id);
+      const firstOfCategory = rest.findIndex((t) => t.category === moved.category);
+      const insertAt = firstOfCategory === -1 ? rest.length : firstOfCategory;
+      const next = [...rest];
+      next.splice(insertAt, 0, moved);
+      return next;
+    });
+
+    try {
+      const res = await fetch(`/api/tasks/reorder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updates: bulkUpdates }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to save new order");
+      }
+      toast.success("Moved to Top", `${task.previewTitle || "Link"} is now first in ${task.category}.`);
+    } catch (err: any) {
+      console.error("Failed to move to top", err);
+      toast.error("Move Failed", err.message || "Failed to update link order");
+    }
+  };
+
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId } = result;
 
@@ -293,6 +336,7 @@ export default function KanbanBoard() {
                 tasks={tasksByCategory[category]}
                 onDeleteTask={handleDeleteClick}
                 onMoveTask={handleMoveClick}
+                onMoveToTopTask={handleMoveToTop}
               />
             ))}
           </div>

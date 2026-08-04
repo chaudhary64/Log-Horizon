@@ -23,9 +23,10 @@ interface ColumnProps {
   tasks: Task[];
   onDeleteTask: (id: string) => void;
   onMoveTask: (id: string) => void;
+  onMoveToTopTask: (id: string) => void;
 }
 
-export default function Column({ id, title, tasks, onDeleteTask, onMoveTask }: ColumnProps) {
+export default function Column({ id, title, tasks, onDeleteTask, onMoveTask, onMoveToTopTask }: ColumnProps) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -73,6 +74,7 @@ export default function Column({ id, title, tasks, onDeleteTask, onMoveTask }: C
                 index={index} 
                 onDelete={onDeleteTask} 
                 onMove={onMoveTask} 
+                onMoveToTop={onMoveToTopTask} 
               />
             ))}
             {provided.placeholder}
